@@ -19,6 +19,60 @@ $recipes = [
         'is_enabled' => true,
     ],
 ];
+
+
+$users = [
+    [
+        'full_name' => 'Mickaël Andrieu',
+        'email' => 'mickael.andrieu@exemple.com',
+        'age' => 34,
+    ],
+    [
+        'full_name' => 'Mathieu Nebra',
+        'email' => 'mathieu.nebra@exemple.com',
+        'age' => 34,
+    ],
+    [
+        'full_name' => 'Laurène Castor',
+        'email' => 'laurene.castor@exemple.com',
+        'age' => 28,
+    ],
+];
+
+function isValidRecipe(array $recipe): bool
+{
+    if (array_key_exists('is_enabled', $recipe)) {
+        $isEnabled = $recipe['is_enabled'];
+    } else {
+        $isEnabled = false;
+    }
+
+    return $isEnabled;
+}
+
+function getRecipes(array $recipes): array
+{
+    $validRecipes = [];
+
+    foreach ($recipes as $recipe) {
+        if (isValidRecipe($recipe)) {
+            $validRecipes[] = $recipe;
+        }
+    }
+
+    return $validRecipes;
+}
+
+
+function displayAuthor(string $authorEmail, array $users): string
+{
+    foreach ($users as $user) {
+        if ($authorEmail === $user['email']) {
+            return $user['full_name'] . '(' . $user['age'] . ' ans)';
+        }
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -28,22 +82,22 @@ $recipes = [
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Affichage des recettes</title>
+    <title>Recettes de cuisine</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
     <h1>Affichage des recettes</h1>
     <!-- boucles for the recipes-->
-    <?php foreach ($recipes as $recipe) {
+    <?php foreach (getRecipes($recipes) as $recipe) {
         // check if the key exists, if yes, display the recipe
-        if (array_key_exists('is_enabled', $recipe) && $recipe['is_enabled'] === true) { ?>
-            <article>
-                <h3><?= $recipe['title'] ?></h3>
-                <div><?= $recipe['recipe'] ?></div>
-                <i><?= $recipe['author'] ?></i>
-            </article>
-    <?php }
-    } ?>
+    ?>
+        <article>
+            <h3><?= $recipe['title'] ?></h3>
+            <div><?= $recipe['recipe'] ?></div>
+            <i><?= displayAuthor($recipe['author'], $users) ?></i>
+        </article>
+    <?php } ?>
 </body>
 
 </html>
