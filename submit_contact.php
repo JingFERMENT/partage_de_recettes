@@ -8,17 +8,50 @@
  $postData = $_POST;
 
  if (
-     !isset($postData['email'])
-     || !filter_var($postData['email'], FILTER_VALIDATE_EMAIL)
-     || empty($postData['message'])
-     || trim($postData['message']) === ''
- ) {
-     echo('Il faut un email et un message valides pour soumettre le formulaire.');
-     return;
+    !isset($postData['email'])
+    || !filter_var($postData['email'], FILTER_VALIDATE_EMAIL)
+    || empty($postData['message'])
+    || trim($postData['message']) === ''
+) {
+    echo('Il faut un email et un message valides pour soumettre le formulaire.');
+    return;
+}
+
+//  1) tester si le fichier a bien été envoyé et s'il n'y a pas d'erreur 
+
+$isFileLoaded = false;
+
+ if(isset($_FILES['screenshot']) && $_FILES['screenshot']['error'] === 0) {
+    // tester si le fichier est trop volumineux 
+    if($_FILES['screenshot']['size'] > 1000000) {
+        echo 'L\'envoi n\'a pas pu être effectué, erreur ou image trop volumineuse.';
+        return;
+    }
+
+    // 2) tester si l'extension est autorisée  
+    $extension = pathinfo($_FILES['screenshot']['name'], PATHINFO_EXTENSION);
+    $allowedExtensions = ['jpeg', 'jpg', 'gif', 'png'];
+
+    if(!in_array($extension,$allowedExtensions)){
+        echo "L'envoi n'a pas pu être effectué, l'extension {$extension} n'est pas authorisée.";
+        return;
+    }
+
+    // 3) tester si le dossier pour uploader les fichiers existent 
+    $path = __DIR__ . '/uploads/' ;
+    if(!is_dir($path)){
+        echo 'L\'envoi n\'est pas pu être effectué, le dossier upload est manquant.';
+        return;
+    }
+
+    // 4) on peut valider le fichier et le stocker définitivement
+    $filename = uniqid('img_');
+    $from = $_FILES['screenshot']['tmp_name'];
+    $toBack = $path . $filename . '.' . $extension;
+    move_uploaded_file($from, $toBack);
+    $isFileLoaded = true;
  }
-
 ?>
-
 
 
 
@@ -42,7 +75,13 @@
             <div class="card-body">
                 <h5 class="card-title">Rappel de vos informations</h5>
                 <p class="card-text"><b>Email</b> : <?= $postData['email']; ?></p>
-                <p class="card-text"><b>Message</b> : <?= $postData['message']; ?></p>
+                <!-- strip_tags : retirer les balises HTML -->
+                <p class="card-text"><b>Message</b> : <?= strip_tags($postData['message']); ?></p>
+            <?php if($isFileLoaded) {?>
+                <div class="alert alert-success" role="alert">
+                L'envoi a bien été effectué !
+            </div>
+            <?php }?>
             </div>
         </div>
     </div>
