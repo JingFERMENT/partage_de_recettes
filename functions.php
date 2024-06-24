@@ -51,4 +51,11 @@ function getRecipes(array $recipes) : array
         }
     return $valid_recipes;
 }
+
+// function for redirect the URL
+function redirectToUrl(string $url):never {
+    header("Location: {$url}");
+    exit();
+
+}
 ?>
