@@ -35,7 +35,7 @@ session_start();
             <?php if (isset($_SESSION['loggedUser']) && $recipe['author'] === $_SESSION['loggedUser']['email']) { ?>
                 <ul class="list-group list-group-horizontal">
                     <li class="list-group-item"><a class="link-warning" href="recipes_update.php?id=<?=$recipe['recipe_id']?>">Editer l'article</a></li>
-                    <li class="list-group-item"><a class="link-danger" href="">Supprimer l'article</a></li>
+                    <li class="list-group-item"><a class="link-danger" href="recipes_delete.php?id=<?=$recipe['recipe_id']?>">Supprimer l'article</a></li>
                 </ul>
         <?php }
         } ?>
