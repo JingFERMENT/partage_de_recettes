@@ -1,6 +1,8 @@
 <?php
 require_once(__DIR__ . '/variables.php');
 require_once(__DIR__ . '/functions.php');
+require_once(__DIR__ .'/config/mysql.php');
+require_once(__DIR__ .'/databaseconnect.php');
 session_start();
 ?>
 
@@ -30,9 +32,15 @@ session_start();
                 <div><?= $recipe['recipe']; ?></div>
                 <i><?= displayAuthor($recipe['author'], $users); ?></i>
             </article>
-        <?php } ?>
+            <?php if (isset($_SESSION['loggedUser']) && $recipe['author'] === $_SESSION['loggedUser']['email']) { ?>
+                <ul class="list-group list-group-horizontal">
+                    <li class="list-group-item"><a class="link-warning" href="recipes_update.php?id=<?=$recipe['recipe_id']?>">Editer l'article</a></li>
+                    <li class="list-group-item"><a class="link-danger" href="">Supprimer l'article</a></li>
+                </ul>
+        <?php }
+        } ?>
     </div>
-    
+
     <!-- inclusion du bas de page du site -->
     <?php require_once(__DIR__ . '/footer.php'); ?>
 </body>

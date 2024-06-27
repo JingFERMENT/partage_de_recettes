@@ -9,4 +9,4 @@ $users = $usersStatement->fetchAll();
 
 $recipesStatement = $mysqlClient->prepare('SELECT * FROM `recipes`');
 $recipesStatement->execute();
-$recepis = $recipesStatement->fetchAll();
+$recipes = $recipesStatement->fetchAll();

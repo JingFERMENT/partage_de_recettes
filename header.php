@@ -15,6 +15,9 @@
                 </li>
                 <?php if (isset($_SESSION['loggedUser'])) { ?>
                     <li class="nav-item">
+                        <a class="nav-link" href="recipes_create.php">Ajouter une recette</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="logout.php">Déconnexion</a>
                     </li>
                 <?php } ?>
