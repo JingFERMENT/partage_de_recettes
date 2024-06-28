@@ -27,9 +27,8 @@ session_start();
         <?php require_once(__DIR__ . '/login.php'); ?>
 
         <?php foreach (getRecipes($recipes) as $recipe) { ?>
-            <article>
-                <h3><?= $recipe['title']; ?></h3>
-                <div><?= $recipe['recipe']; ?></div>
+            <article class="my-3">
+                <h3><a href="/recipes_read.php?id=<?= $recipe['recipe_id']; ?>"><?= $recipe['title']; ?></a></h3>
                 <i><?= displayAuthor($recipe['author'], $users); ?></i>
             </article>
             <?php if (isset($_SESSION['loggedUser']) && $recipe['author'] === $_SESSION['loggedUser']['email']) { ?>

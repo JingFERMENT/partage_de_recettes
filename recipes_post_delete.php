@@ -14,7 +14,7 @@ if (!isset($getData['id']) || !is_numeric($getData['id'])) {
 }
 
 // delete the recipe
-$sqlQuery = 'DELETE FROM `recipes` where recipe_id = :id';
+$sqlQuery = 'DELETE FROM `recipes` WHERE recipe_id = :id';
 $retrievedRecipeStatement = $mysqlClient->prepare($sqlQuery);
 $retrievedRecipeStatement->execute([
     'id' => (int)$getData['id'],
