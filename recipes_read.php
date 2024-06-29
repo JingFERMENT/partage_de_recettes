@@ -32,7 +32,7 @@ if (!$recipe) {
 $sqlQuery = 'SELECT * FROM `comments` 
 JOIN `recipes` ON recipes.recipe_id = comments.recipe_id 
 JOIN `users` ON users.user_id = comments.user_id
-WHERE recipes.recipe_id = :id';
+WHERE recipes.recipe_id = :id ORDER BY created_at DESC';
 $retrievedCommentStatement = $mysqlClient->prepare($sqlQuery);
 $retrievedCommentStatement->execute([
     'id' => (int)$getData['id'],
@@ -41,7 +41,19 @@ $retrievedCommentStatement->execute([
 // display the comments
 $comments = $retrievedCommentStatement->fetchAll();
 
+// get the averge rating of the comments
 
+$sqlQuery = 'SELECT ROUND(AVG(comments.review),1) AS rating FROM `comments` 
+JOIN `recipes` ON recipes.recipe_id = comments.recipe_id 
+WHERE recipes.recipe_id = :id';
+$retrievedCommentStatementWithComments = $mysqlClient->prepare($sqlQuery);
+$retrievedCommentStatementWithComments->execute([
+    'id' => (int)$getData['id'],
+]);
+
+// display the average note
+$averageNote = $retrievedCommentStatementWithComments->fetch();
+$averageNoteInNumeric = (int) implode('', $averageNote);
 
 ?>
 
@@ -60,30 +72,32 @@ $comments = $retrievedCommentStatement->fetchAll();
 
         <?php require_once(__DIR__ . '/header.php') ?>
 
-        <h1 class="my-5"><?= $recipe['title'] ?></h1>
-
+        <h1 class="mt-5"><?= $recipe['title'] ?></h1>
         <div>
             <article>
                 <?= $recipe['recipe'] ?>
             </article>
             <aside class="my-3">
                 <p><i>Contribuée par <?= $recipe['author'] ?></i></p>
+                
+                <p><b>Evaluée par la communauté à <?=$averageNoteInNumeric?> / 5 </b></p>
             </aside>
         </div>
-
-        <h4 class="text-secondary">Vos commentaires: </h4>
+        <hr />
+        <h2 class="text-secondary my-3">Commentaires</h2>
             <?php if ($comments != NULL) {
                 foreach ($comments as $comment) { ?>
-                    <div class="text-muted"><?= $comment['full_name'] ?></div>
-                    <div class="text-muted"><?= $comment['comment'] ?></div>
+                    <p><?=date('Y-m-d', strtotime($comment['created_at']))
+                    ?> <i>écrit par <?= $comment['full_name'] ?></i></p>
+                    <p><?= $comment['comment'] ?></p>
+                    
     <?php }
             } else { ?>
     <p>Aucun Commentaire</p>
 <?php } ?>
 
-
-
-
+<hr />
+<h2 class="text-secondary my-3">A vous de jouer !</h2>
 <?php if (isset($_SESSION['loggedUser'])) { ?>
     <?php require_once(__DIR__ . '/comments_create.php'); ?>
 <?php } ?>

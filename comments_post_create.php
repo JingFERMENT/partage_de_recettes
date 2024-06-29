@@ -1,44 +1,51 @@
-<?php 
+<?php
 session_start();
 require_once(__DIR__ . '/isConnect.php');
 require_once(__DIR__ . '/databaseconnect.php');
-require_once(__DIR__. '/config/mysql.php');
+require_once(__DIR__ . '/config/mysql.php');
 
 // data validation for comments' form 
 
 $getData = $_GET;
-
 $postData = $_POST;
-
 if (
     !isset($getData['id'])
     || !is_numeric($getData['id'])
+    || empty($postData['review'])
+    || !is_numeric($postData['review'])
     || empty($postData['comment'])
     || trim(strip_tags($postData['comment'])) === ''
 ) {
-    echo 'Le commentaire est invalide !';
+    echo 'Le commentaire ou la note est invalide !';
     return;
 }
 
 $comment = trim(strip_tags($postData['comment']));
+$review = (int)$postData['review'];
+
+if ($review < 1 || $review > 5) {
+    echo 'La note doit être comprise entre 1 et 5.';
+}
 
 // query for create the comment
-$sqlQuery = 'INSERT INTO `comments` (`user_id`, `recipe_id`, `comment`)
-            VALUES (:user_id, :recipe_id, :comment);';
+$sqlQuery = 'INSERT INTO `comments` (`user_id`, `recipe_id`, `comment`, `review`)
+            VALUES (:user_id, :recipe_id, :comment, :review);';
 
 // preparation 
-$insertComment =$mysqlClient->prepare($sqlQuery);
+$insertComment = $mysqlClient->prepare($sqlQuery);
 
 // execution 
 $insertComment->execute([
-    'user_id'=> $_SESSION['loggedUser']['user_id'],
+    'user_id' => $_SESSION['loggedUser']['user_id'],
     'recipe_id' => $getData['id'],
-    'comment' => $comment
+    'comment' => $comment,
+    'review' => $review
 ]);
 ?>
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -52,10 +59,11 @@ $insertComment->execute([
     <div class="container">
         <!-- header -->
         <?php require_once(__DIR__ . '/header.php'); ?>
-        <h1>Commentaire ajouté avec succès !</h1>
+        <h1>Commentaire ajoutés avec succès !</h1>
         <div class="card">
             <div class="card-body">
-                <p class="card-text"><b>Votre commentaire</b> : <?=$comment?></p>
+                <p class="card-text"><b>Votre note</b> : <?= $review ?></p>
+                <p class="card-text"><b>Votre commentaire</b> : <?= $comment ?></p>
             </div>
         </div>
     </div>
