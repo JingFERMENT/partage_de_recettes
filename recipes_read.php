@@ -13,7 +13,7 @@ if (!isset($getData['id']) || !is_numeric($getData['id'])) {
 }
 
 // get the recipe
-$sqlQuery = 'SELECT * FROM `recipes` where recipe_id = :id';
+$sqlQuery = 'SELECT * FROM `recipes` WHERE recipe_id = :id';
 $retrievedRecipeStatement = $mysqlClient->prepare($sqlQuery);
 $retrievedRecipeStatement->execute([
     'id' => (int)$getData['id'],
@@ -27,6 +27,22 @@ if (!$recipe) {
     echo 'La recette n\'existe pas';
     return;
 }
+
+// get the comments 
+$sqlQuery = 'SELECT * FROM `comments` 
+JOIN `recipes` ON recipes.recipe_id = comments.recipe_id 
+JOIN `users` ON users.user_id = comments.user_id
+WHERE recipes.recipe_id = :id';
+$retrievedCommentStatement = $mysqlClient->prepare($sqlQuery);
+$retrievedCommentStatement->execute([
+    'id' => (int)$getData['id'],
+]);
+
+// display the comments
+$comments = $retrievedCommentStatement->fetchAll();
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -55,18 +71,22 @@ if (!$recipe) {
             </aside>
         </div>
 
-        <?php if(!$comments === NULL) {
-             echo 'Vos commentaires';
-        } else  {
-            echo 'Nom de l\'utilisateur';
-        }?>
-        
-        
+        <h4 class="text-secondary">Vos commentaires: </h4>
+            <?php if ($comments != NULL) {
+                foreach ($comments as $comment) { ?>
+                    <div class="text-muted"><?= $comment['full_name'] ?></div>
+                    <div class="text-muted"><?= $comment['comment'] ?></div>
+    <?php }
+            } else { ?>
+    <p>Aucun Commentaire</p>
+<?php } ?>
 
 
-        <?php if (isset($_SESSION['loggedUser'])) { ?>
-            <?php require_once(__DIR__ . '/comments_create.php'); ?>
-        <?php } ?>
+
+
+<?php if (isset($_SESSION['loggedUser'])) { ?>
+    <?php require_once(__DIR__ . '/comments_create.php'); ?>
+<?php } ?>
     </div>
 
     <?php require_once(__DIR__ . '/footer.php') ?>
